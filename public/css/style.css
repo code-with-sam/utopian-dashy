@@ -1,0 +1,32 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+main {
+  margin: 0 auto;
+  width: 1280px;
+}
+
+.project-card {
+  width: 31.33%;
+  padding: 30px;
+  border: solid 1px #ccc;
+  float: left;
+  margin: 20px 1%;
+}
+
+.cf {
+  content: "";
+  display: table;
+  clear: both;
+}
