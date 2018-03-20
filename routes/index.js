@@ -4,16 +4,9 @@ let utopian = require('utopian-api');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-
-
-  utopian.getPostByAuthor('sambillingham').then((data) => {
-        res.render('index', {
-          title: 'Express',
-          data: data
-       });
-    	}
-  );
-
+   res.render('index', {
+      title: 'Express'
+   });
 });
 
 router.get('/data/:username', function(req, res) {
@@ -22,6 +15,18 @@ router.get('/data/:username', function(req, res) {
     .then((data) => res.json(data));
 });
 
+router.get('/category/:category', (req, res) => {
+  let category = req.params.category
+
+  let data = [utopian.getPosts({ sortBy: 'created', type: category }),
+   utopian.getPosts({ sortBy: 'created', type: category, skip: 50}),
+   utopian.getPosts({ sortBy: 'created', type: category, skip: 100}) ]
+
+   Promise.all(data).then((data) => {
+     let merge = data.map(x => x.results).reduce((all, arr) => all.concat(arr) ,[])
+     res.json(merge)
+   });
+});
 
 
 module.exports = router;

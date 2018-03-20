@@ -1,25 +1,57 @@
 const octokit = new Octokit()
-const USERNAME = 'sambillingham';
 
-utopianData(USERNAME).then( data => {
-  let uniqueProjects = getUniqueProjects(data)
-  let projectData = data.results
-  displayProjects(uniqueProjects, projectData)
-  displayHeader(USERNAME, uniqueProjects, projectData)
-})
+if ( $('main').hasClass('profile') ){
+  let user = $('main').data('username');
+  console.log(user)
+  initProfile(user)
+}
+
+if ( $('main').hasClass('landing') ){
+  utopianCategoryData('development').then(data => {
+
+    let oneWeekAgo = new Date(moment().subtract(7,'days').format('YYYY-MM-DDThh:mm:ss') );
+    let oneDayAgo = new Date(moment().subtract(1,'days').format('YYYY-MM-DDThh:mm:ss') );
+
+    let weeklyProjects = data.filter( project => new Date(project.created).valueOf() >= oneWeekAgo.valueOf() )
+    let weeklyAuthors = [...new Set(weeklyProjects.map(project => project.author))]
+    let dailyProjects = data.filter( project => new Date(project.created).valueOf() >= oneDayAgo.valueOf() )
+    let dailyauthors = [...new Set(dailyProjects.map(project => project.author))]
+
+    console.log(weeklyAuthors, weeklyProjects)
+    console.log(dailyauthors, dailyProjects)
+  })
+
+}
+
+function initProfile(username){
+  utopianUserData(username).then( data => {
+    let uniqueProjects = getUniqueProjects(data)
+    let projectData = data.results
+    displayProjects(uniqueProjects, projectData)
+    displayHeader(username, uniqueProjects, projectData)
+  })
+}
 
 function steemData(username){
   return steem.api.getAccountsAsync([username])
 }
 
-function utopianData(username){
+function utopianCategoryData(category){
+  return new Promise((resolve,reject) => {
+    $.get(`/category/${category}`, (result, res) => {
+      if(res === 'success') resolve(result)
+    })
+  })
+}
+
+function utopianUserData(username){
   return new Promise((resolve,reject) => {
     $.get(`/data/${username}`, (result, res) => {
       if(res === 'success') resolve(result)
     })
   })
 }
-
+    
 function getUniqueProjects(data) {
   let development = data.results.filter(project => project.json_metadata.type === 'development')
   let repos = development.map(project => project.json_metadata.repository.name)
@@ -34,7 +66,7 @@ async function displayHeader(username, uniqueProjects, projectData){
   try { profileImage = JSON.parse(user[0].json_metadata).profile.profile_image } catch(error){console.warn(error)}
   console.log(profileImage)
 
-  let template = `@${USERNAME} has contributed ${development.length} updates over ${uniqueProjects.length} Projects`
+  let template = `@${username} has contributed ${development.length} updates over ${uniqueProjects.length} Projects`
   $('header').append(template)
 }
 
