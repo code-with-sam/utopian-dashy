@@ -1,3 +1,4 @@
+const octokit = new Octokit()
 const USERNAME = 'sambillingham';
 
 utopianData(USERNAME).then( data => {
@@ -35,7 +36,11 @@ function singleProjectTemplate(projectName, projectData){
   let avgVotes = projectPosts.reduce((total,post) => total + post.net_votes, 0) / projectPosts.length
   let latestUpdate = projectPosts[0]
   let projectURL = latestUpdate.json_metadata.repository.html_url
-  console.log(votes)
+  let age = moment(latestUpdate.created).startOf('day').fromNow();
+  let repo = await getGithubRepo(latestUpdate.json_metadata.repository.full_name)
+  // console.log(repo.data.forks_count)
+  let repoStars = repo.data.stargazers_count
+
   return template = `
   <div class="project-card">
 
@@ -44,5 +49,17 @@ function singleProjectTemplate(projectName, projectData){
     <h3>Updated: ${latestUpdate.created}</h3>
     <h4>Update Count ${projectPosts.length}</h4>
     <h4>Average Votes ${avgVotes}</h4>
+    <h4>Average Comments ${avgComments}</h4>
+    <h4>Gh Stars ${repoStars}</h4>
   </div>`
+}
+
+async function getGithubRepo(repoPath){
+  let repoPathParts = repoPath.split('/')
+  let owner = repoPathParts[0]
+  let name = repoPathParts[1]
+  return octokit.repos.get({
+    owner: owner,
+    repo: name
+  })
 }
