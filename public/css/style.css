@@ -12,6 +12,9 @@ a {
   color: #00B7FF;
 }
 
+header {
+  text-align: center;
+}
 main {
   margin: 0 auto;
   width: 1280px;
@@ -20,10 +23,15 @@ main {
 .project-card {
   width: 31.33%;
   padding: 30px;
-  border: solid 1px #ccc;
+  border: solid 1px #fafafa;
   float: left;
   margin: 20px 1%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
+
+
+
+
 
 .cf {
   content: "";

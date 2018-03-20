@@ -5,7 +5,12 @@ utopianData(USERNAME).then( data => {
   let uniqueProjects = getUniqueProjects(data)
   let projectData = data.results
   displayProjects(uniqueProjects, projectData)
+  displayHeader(USERNAME, uniqueProjects, projectData)
 })
+
+function steemData(username){
+  return steem.api.getAccountsAsync([username])
+}
 
 function utopianData(username){
   return new Promise((resolve,reject) => {
@@ -22,18 +27,30 @@ function getUniqueProjects(data) {
   return uniqueProjects
 }
 
+async function displayHeader(username, uniqueProjects, projectData){
+  let user = await steemData(username);
+  let development = projectData.filter(project => project.json_metadata.type === 'development')
+  let profileImage;
+  try { profileImage = JSON.parse(user[0].json_metadata).profile.profile_image } catch(error){console.warn(error)}
+  console.log(profileImage)
+
+  let template = `@${USERNAME} has contributed ${development.length} updates over ${uniqueProjects.length} Projects`
+  $('header').append(template)
+}
+
 function displayProjects(uniqueProjects, projectData) {
   console.log(uniqueProjects, projectData)
-  uniqueProjects.forEach( (projectName) => {
-    let template = singleProjectTemplate(projectName, projectData)
+  uniqueProjects.forEach( async (projectName) => {
+    let template = await singleProjectTemplate(projectName, projectData)
     $('main').append(template)
   })
 }
 
-function singleProjectTemplate(projectName, projectData){
+async function singleProjectTemplate(projectName, projectData){
   let projectPosts = projectData.filter(project => project.json_metadata.repository.name === projectName)
   let votes = projectPosts.map(project => project.net_votes)
   let avgVotes = projectPosts.reduce((total,post) => total + post.net_votes, 0) / projectPosts.length
+  let avgComments = Math.round(projectPosts.reduce((total,post) => total + post.children, 0) / projectPosts.length)
   let latestUpdate = projectPosts[0]
   let projectURL = latestUpdate.json_metadata.repository.html_url
   let age = moment(latestUpdate.created).startOf('day').fromNow();
@@ -45,8 +62,8 @@ function singleProjectTemplate(projectName, projectData){
   <div class="project-card">
 
     <h2>${projectName}</h2>
-    <h3>Latest: <a href="https://utopian.io/${latestUpdate.url}">${latestUpdate.title}</a></h3>
-    <h3>Updated: ${latestUpdate.created}</h3>
+    <h3>Latest: <a href="https://utopian.io${latestUpdate.url}">${latestUpdate.title}</a></h3>
+    <h3>Updated: ${age}</h3>
     <h4>Update Count ${projectPosts.length}</h4>
     <h4>Average Votes ${avgVotes}</h4>
     <h4>Average Comments ${avgComments}</h4>
