@@ -81,15 +81,25 @@ function landingStats(data){
 
   console.log('LOG: ', previousFlagged14 , weeklyFlaggedProjects)
 
+  let approved24Change = ((dailyapprovedProjects.length - previousReviewed48.length)/previousReviewed48.length)*100
+  if (approved24Change < 0) $('.stat__project24--approved-change').addClass('--negative')
+  let flagged24Change = ((dailyFlaggedProjects.length - previousFlagged48.length)/previousFlagged48.length)*100
+  if (flagged24Change < 0) $('.stat__project24--flagged-change').addClass('--negative')
 
-  $('.data__project24--approved').text(dailyapprovedProjects.length + ' Approved')
-  $('.data__project24--approved-change').text( (((dailyapprovedProjects.length - previousReviewed48.length)/previousReviewed48.length)*100 ).toFixed(2)+ '%')
-  $('.data__project24--flagged').text(dailyFlaggedProjects.length + ' Rejected')
-  $('.data__project24--flagged-change').text( (((dailyFlaggedProjects.length - previousFlagged48.length)/previousFlagged48.length)*100 ).toFixed(2)+ '%')
-  $('.data__project7--approved').text(weeklyapprovedProjects.length + ' Approved')
-  $('.data__project7--approved-change').text( (((weeklyapprovedProjects.length - previousReviewed14.length)/previousReviewed14.length)*100 ).toFixed(2)+ '%')
-  $('.data__project7--flagged').text(weeklyFlaggedProjects.length + ' Rejected')
-  $('.data__project7--flagged-change').text( (((weeklyFlaggedProjects.length - previousFlagged14.length)/previousFlagged14.length)*100 ).toFixed(2)+ '%')
+  let approved7Change = ((weeklyapprovedProjects.length - previousReviewed14.length)/previousReviewed14.length)*100
+  if (approved7Change < 0) $('.stat__project7--approved-change').addClass('--negative')
+  let flagged7Change = ((weeklyFlaggedProjects.length - previousFlagged14.length)/previousFlagged14.length)*100
+  if (flagged7Change < 0) $('.stat__project7--flagged-change').addClass('--negative')
+
+  $('.stat__project24--approved').text(dailyapprovedProjects.length )
+  $('.stat__project24--approved-change').text(  approved24Change.toFixed(2) + '%')
+  $('.stat__project24--flagged').text(dailyFlaggedProjects.length )
+  if (dailyFlaggedProjects > 0 ) $('.stat__project24--flagged-change').text( flagged24Change.toFixed(2)+ '%')
+
+  $('.stat__project7--approved').text(weeklyapprovedProjects.length )
+  $('.stat__project7--approved-change').text( approved7Change.toFixed(2)+ '%')
+  $('.stat__project7--flagged').text(weeklyFlaggedProjects.length )
+  $('.stat__project7--flagged-change').text(  flagged7Change.toFixed(2)+ '%')
 
   // $('.data.data__developers7').text(weeklyDevelopers.length)
 }

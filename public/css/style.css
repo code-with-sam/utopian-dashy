@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Varela+Round');
 * {
   padding: 0;
   margin: 0;
@@ -32,20 +33,70 @@ main {
 .hero {
   width: 100%;
 }
-.banner,
-.block {
-  padding: 15px;
-  border: solid 1px #ccc;
-  width: 50%;
+
+.statistics,
+.stat__cards {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 100%;
+}
+.stat__pannel {
+}
+.stat__card {
+  padding: 20px;
+  border: solid 1px #fafafa;
+  margin: 5%;
+  background: #fff;
+  box-shadow: 0 0.375rem 1.25rem 0 rgba(61,66,80,.18);
+  border-radius: .625rem;
+  position: relative;
+  text-align: center;
+}
+
+.stat__title {
+  text-align: center;
+}
+.stat__number {
+  display: inline-block;
   float: left;
 }
+.stat {
+  font-size: 52px;
+  line-height: 1;
+}
+.stat__detail {
+  /*text-align: right;*/
+  /*position: absolute;
+  bottom: 0;
+  right: 0;*/
+}
+.--positive {
+  color: #72e77b;
+  display: inline-block;
+  font-size: 30px;
+  margin-top: 20px;
+  margin: 20px 0 0 5px;
+}
+.--negative {
+  color: #e78d72;
+}
+.stat__project7--flagged-change,
+.stat__project7--approved-change,
+.stat__project24--flagged-change,
+.stat__project24--approved-change {
+  display: inline-block;
+  font-size: 30px;
+  margin: 20px 0 5px
+}
+
+
 
 .profile__lead {
 padding: 50px 0 75px;
 }
 .profile__lead a {
   color: #6f749a;
-
 }
 .grid {
   width: 100%;
@@ -53,6 +104,14 @@ padding: 50px 0 75px;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 100%;
 }
+
+.grid__title {
+  padding: 50px 0 50px;
+  text-align: center;
+  font-size: 22px;
+}
+
+
 .project-card {
   padding: 30px 30px 30px;
   border: solid 1px #fafafa;

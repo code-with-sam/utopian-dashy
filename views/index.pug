@@ -3,28 +3,36 @@ extends layout
 block content
   header
   main.landing
-    h3 past 7 days: X(+2.4%) Projects by Y(-10%) developers - 95% approval
-    h3 past 24hours X(-10%) Projects by Y(+4.3) developers  - 85% approval
 
     section.hero
-      .banner.cf
-        h2 last 24 hours
-        .block
-          p.data.data__project24--approved 0
-          p.data.data__project24--approved-change 0
-        .block
-          p.data.data__project24--flagged 0
-          p.data.data__project24--flagged-change 0
+      .statistics
+        .stat__pannel
+          h2.stat__title last 24 hours
+          .stat__cards
+            .stat__card
+              .stat__number
+                span.stat.stat__project24--approved 0
+                .stat__detail Approved
+              span.stat.stat__project24--approved-change.--positive
+            .stat__card
+              .stat__number
+                span.stat.stat__project24--flagged 0
+                .stat__detail Rejected
+              span.stat.stat__project24--flagged-change.--positive
 
-      .banner
-        h2 last 7 Days
-        .block
-          p.data.data__project7--approved 0
-          p.data.data__project7--approved-change 0
+        .stat__pannel
+          h2.stat__title last 7 Days
+          .stat__cards
+            .stat__card
+                .stat__number
+                  span.stat.stat__project7--approved 0
+                  .stat__detail Approved
+                span.stat.stat__project7--approved-change.--positive
+            .stat__card
+                .stat__number
+                  span.stat.stat__project7--flagged 0
+                  .stat__detail Rejected
+                span.stat.stat__project7--flagged-change.--positive
 
-        .block
-          p.data.data__project7--flagged 0
-          p.data.data__project7--flagged-change 0
-
-    h4 latest Projects
+    h2.grid__title Latest Utopian Projects
     section.grid
