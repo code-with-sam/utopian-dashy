@@ -7,25 +7,46 @@ if ( $('main').hasClass('profile') ){
 }
 
 if ( $('main').hasClass('landing') ){
+
+  utopianPendingData('development').then(data => {
+    // console.log('pending: ', data)
+  })
+
   utopianCategoryData('development').then(data => {
+    console.log(data)
+    // let oneWeekAgo = new Date(moment().subtract(7,'days').format('YYYY-MM-DDThh:mm:ss') );
+    // let oneDayAgo = new Date(moment().subtract(1,'days').format('YYYY-MM-DDThh:mm:ss') );
 
-    let oneWeekAgo = new Date(moment().subtract(7,'days').format('YYYY-MM-DDThh:mm:ss') );
-    let oneDayAgo = new Date(moment().subtract(1,'days').format('YYYY-MM-DDThh:mm:ss') );
+    // let dailyProjects = data.filter( project => new Date(project.created).valueOf() >= oneDayAgo.valueOf() )
 
-    let weeklyProjects = data.filter( project => new Date(project.created).valueOf() >= oneWeekAgo.valueOf() )
-    let weeklyAuthors = [...new Set(weeklyProjects.map(project => project.author))]
-    let dailyProjects = data.filter( project => new Date(project.created).valueOf() >= oneDayAgo.valueOf() )
-    let dailyauthors = [...new Set(dailyProjects.map(project => project.author))]
 
-    // console.log(weeklyAuthors, weeklyProjects)
-    // console.log(dailyauthors, dailyProjects)
+    // let weeklyDevelopers = [...new Set(weeklyProjects.map(project => project.author))]
+
+    // console.log(weeklyDevelopers, weeklyProjects)
+    // console.log(dailyDevelopers, dailyProjects)
+    landingStats(data)
   })
 
   // $.getJSON('https://api.utopian.io/api/posts?status=flagged&type=development', (data) => {
   //   console.log(data)
   // })
+
   initLatestPosts()
 }
+
+function filterUtopianData(data, modVerdict, timeWindowInDays){
+  let timeWindow = new Date(moment().subtract(timeWindowInDays,'days').format('YYYY-MM-DDThh:mm:ss') );
+  let results = data.filter(project => project[modVerdict] === true)
+  return results.filter( project => new Date(project.created).valueOf() >= timeWindow.valueOf() )
+}
+
+function filterPreviousUtopianData(data, modVerdict, timeWindowInDaysStart, timeWindowInDaysEnd ){
+  let timeWindowStart = new Date(moment().subtract(timeWindowInDaysStart,'days').format('YYYY-MM-DDThh:mm:ss') );
+  let timeWindowEnd = new Date(moment().subtract(timeWindowInDaysEnd,'days').format('YYYY-MM-DDThh:mm:ss') );
+  let results = data.filter(project => project[modVerdict] === true)
+  return results.filter( project => new Date(project.created).valueOf() >= timeWindowEnd.valueOf() && new Date(project.created).valueOf() <= timeWindowStart.valueOf() )
+}
+
 
 function initLatestPosts(){
   let flagged = 'https://api.utopian.io/api/posts?status=flagged&type=development'
@@ -45,6 +66,32 @@ function initProfile(username){
       displayProjects('main', uniqueProjects, projectData)
       displayHeader(username, uniqueProjects, projectData)
   })
+}
+
+function landingStats(data){
+  let dailyFlaggedProjects = filterUtopianData(data, 'flagged', 1)
+  let dailyapprovedProjects = filterUtopianData(data, 'reviewed', 1)
+  let weeklyFlaggedProjects = filterUtopianData(data, 'flagged', 7)
+  let weeklyapprovedProjects = filterUtopianData(data, 'reviewed', 7)
+
+  let previousFlagged14 = filterPreviousUtopianData(data, 'flagged', 7, 14 )
+  let previousReviewed14 = filterPreviousUtopianData(data, 'reviewed', 7, 14 )
+  let previousFlagged48 = filterPreviousUtopianData(data, 'flagged', 1, 2 )
+  let previousReviewed48 = filterPreviousUtopianData(data, 'reviewed', 1, 2 )
+
+  console.log('LOG: ', previousFlagged14 , weeklyFlaggedProjects)
+
+
+  $('.data__project24--approved').text(dailyapprovedProjects.length + ' Approved')
+  $('.data__project24--approved-change').text( (((dailyapprovedProjects.length - previousReviewed48.length)/previousReviewed48.length)*100 ).toFixed(2)+ '%')
+  $('.data__project24--flagged').text(dailyFlaggedProjects.length + ' Rejected')
+  $('.data__project24--flagged-change').text( (((dailyFlaggedProjects.length - previousFlagged48.length)/previousFlagged48.length)*100 ).toFixed(2)+ '%')
+  $('.data__project7--approved').text(weeklyapprovedProjects.length + ' Approved')
+  $('.data__project7--approved-change').text( (((weeklyapprovedProjects.length - previousReviewed14.length)/previousReviewed14.length)*100 ).toFixed(2)+ '%')
+  $('.data__project7--flagged').text(weeklyFlaggedProjects.length + ' Rejected')
+  $('.data__project7--flagged-change').text( (((weeklyFlaggedProjects.length - previousFlagged14.length)/previousFlagged14.length)*100 ).toFixed(2)+ '%')
+
+  // $('.data.data__developers7').text(weeklyDevelopers.length)
 }
 
 function steemData(username){
