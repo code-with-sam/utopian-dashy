@@ -17,23 +17,46 @@ if ( $('main').hasClass('landing') ){
     let dailyProjects = data.filter( project => new Date(project.created).valueOf() >= oneDayAgo.valueOf() )
     let dailyauthors = [...new Set(dailyProjects.map(project => project.author))]
 
-    console.log(weeklyAuthors, weeklyProjects)
-    console.log(dailyauthors, dailyProjects)
+    // console.log(weeklyAuthors, weeklyProjects)
+    // console.log(dailyauthors, dailyProjects)
+  })
+
+  // $.getJSON('https://api.utopian.io/api/posts?status=flagged&type=development', (data) => {
+  //   console.log(data)
+  // })
+  initLatestPosts()
+}
+
+function initLatestPosts(){
+  let flagged = 'https://api.utopian.io/api/posts?status=flagged&type=development'
+  let reviewd = 'https://api.utopian.io/api/posts?status=reviewed&type=development&limit=200'
+  $.getJSON(reviewd, (data) => {
+    let projects = getUniqueProjects(data)
+    let projectData = data.results
+    displayProjects('.grid', projects, projectData)
   })
 
 }
 
 function initProfile(username){
   utopianUserData(username).then( data => {
-    let uniqueProjects = getUniqueProjects(data)
-    let projectData = data.results
-    displayProjects(uniqueProjects, projectData)
-    displayHeader(username, uniqueProjects, projectData)
+      let uniqueProjects = getUniqueProjects(data)
+      let projectData = data.results
+      displayProjects('main', uniqueProjects, projectData)
+      displayHeader(username, uniqueProjects, projectData)
   })
 }
 
 function steemData(username){
   return steem.api.getAccountsAsync([username])
+}
+
+function utopianPendingData(category){
+  return new Promise((resolve,reject) => {
+    $.get(`/pending/${category}`, (result, res) => {
+      if(res === 'success') resolve(result)
+    })
+  })
 }
 
 function utopianCategoryData(category){
@@ -66,41 +89,63 @@ async function displayHeader(username, uniqueProjects, projectData){
   try { profileImage = JSON.parse(user[0].json_metadata).profile.profile_image } catch(error){console.warn(error)}
   console.log(profileImage)
 
-  let template = `@${username} has contributed ${development.length} updates over ${uniqueProjects.length} Projects`
+  let template = `<h1 class="profile__lead"><a href="https://steemit.com/@{username}">@${username}</a> has contributed ${development.length} submissions over ${uniqueProjects.length} Projects</h1>`
   $('header').append(template)
 }
 
-function displayProjects(uniqueProjects, projectData) {
+function displayProjects(selector, uniqueProjects, projectData) {
   console.log(uniqueProjects, projectData)
   uniqueProjects.forEach( async (projectName) => {
     let template = await singleProjectTemplate(projectName, projectData)
-    $('main').append(template)
+    $(selector).append(template)
   })
 }
 
 async function singleProjectTemplate(projectName, projectData){
   let projectPosts = projectData.filter(project => project.json_metadata.repository.name === projectName)
   let votes = projectPosts.map(project => project.net_votes)
-  let avgVotes = projectPosts.reduce((total,post) => total + post.net_votes, 0) / projectPosts.length
+  let avgVotes =  Math.round(projectPosts.reduce((total,post) => total + post.net_votes, 0) / projectPosts.length)
   let avgComments = Math.round(projectPosts.reduce((total,post) => total + post.children, 0) / projectPosts.length)
   let latestUpdate = projectPosts[0]
   let projectURL = latestUpdate.json_metadata.repository.html_url
   let age = moment(latestUpdate.created).startOf('day').fromNow();
-  let repo = await getGithubRepo(latestUpdate.json_metadata.repository.full_name)
+  // let repo = await getGithubRepo(latestUpdate.json_metadata.repository.full_name)
   // console.log(repo.data.forks_count)
-  let repoStars = repo.data.stargazers_count
+  // let repoStars = 'repo.data.stargazers_count'
+  let repoStars = '22'
+  let latestModifier = projectPosts.length > 1 ? 'Latest: ' : ''
+  let desc = getFirstTag('p', latestUpdate.body).split(" ", 20);
+  let content = desc.join(" ");
+
+  // console.log(latestUpdate.body)
+  let updates = projectPosts.length > 1 ? `<span class="project__updates"><span>${projectPosts.length - 1}</span></span>` : ''
 
   return template = `
   <div class="project-card">
 
-    <h2>${projectName}</h2>
-    <h3>Latest: <a href="https://utopian.io${latestUpdate.url}">${latestUpdate.title}</a></h3>
-    <h3>Updated: ${age}</h3>
-    <h4>Update Count ${projectPosts.length}</h4>
-    <h4>Average Votes ${avgVotes}</h4>
-    <h4>Average Comments ${avgComments}</h4>
-    <h4>Gh Stars ${repoStars}</h4>
+    <h2 class="project__name">${projectName}</h2>
+    <h3 class="project__title">${latestModifier}<a href="https://utopian.io${latestUpdate.url}">${latestUpdate.title}</a></h3>
+    <p class="project__desc">${content + '..'}</p>
+    <h3 class="project__age">Updated ${age}</h3>
+    ${updates}
+    <span class="project__stat">${avgVotes}</span>
+    <span class="project__stat">${avgComments}</span>
+    <span class="project__stat">${repoStars}</span>
   </div>`
+}
+
+function getFirstTag(tag, markdown){
+  var converter = new showdown.Converter();
+  let placeholder = document.createElement('div');
+  placeholder.innerHTML = converter.makeHtml(markdown)
+  let content = placeholder.querySelectorAll(tag) ;
+  let output = 'dsf'
+  for (var i = 0; i < content.length; i++) {
+    let html = content[i].innerHTML;
+    if (!html.includes('img') && html.length > 0 && html != '<br>' && !html.includes('<a') ) {
+      return html
+    }
+  }
 }
 
 async function getGithubRepo(repoPath){
