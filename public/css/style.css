@@ -14,6 +14,85 @@ body {
 a {
   color: #00B7FF;
 }
+.svg-loader {
+  width: 80px;
+  margin: 100px auto 0;
+  display: block;
+}
+.svg-loader--hidden {
+  display: none
+}
+
+.loading {
+  position: fixed;
+  background: #6f749a;
+  background: #f7f9fb;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+.loader-1 {
+  opacity: 0;
+  animation: ring 2100ms forwards infinite;
+}
+.loader-2 {
+  opacity: 0;
+  animation: ring 1500ms forwards infinite;
+  animation-delay: 1800ms;
+}
+.loader-3 {
+  opacity: 0;
+  animation: ring 1500ms forwards infinite;
+  animation-delay: 1500ms;
+}
+.loader-4 {
+  opacity: 0;
+  animation: ring 1500ms forwards infinite;
+  animation-delay: 1200ms;
+}
+.loader-5 {
+  opacity: 0;
+  animation: ring 1500ms forwards infinite;
+  animation-delay: 900ms;
+}
+.loader-6 {
+  opacity: 0;
+  animation: ring 1500ms forwards infinite;
+  animation-delay: 600ms;
+}
+.loader-7 {
+  opacity: 0;
+  animation: ring 1500ms forwards infinite;
+  animation-delay: 300ms;
+}
+.loader-8 {
+  opacity: 0;
+  animation: ring 1500ms forwards infinite;
+}
+
+@keyframes ring {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.loading__message {
+  transition: all 300ms;
+  /*opacity: 1;*/
+  color: #fff;
+  opacity: 0;
+}
+.loading__message--hidden {
+
+}
 
 header {
   text-align: center;

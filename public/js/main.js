@@ -106,6 +106,7 @@ function utopianUserData(username){
 }
     
 function getUniqueProjects(data) {
+  console.log(data)
   let development = data.results.filter(project => project.json_metadata.type === 'development')
   let repos = development.map(project => project.json_metadata.repository.name)
   let uniqueProjects = [...new Set(repos)]
@@ -127,7 +128,11 @@ function displayProjects(selector, uniqueProjects, projectData, view) {
     let template = singleProjectTemplate(projectName, projectData, view)
     $(selector).append(template)
   })
-  if(view === 'category') loadProjectUpdateCount()
+  if(view === 'category') {
+    $('.grid__title').text('Latest Utopian Projects')
+    $('.svg-loader').addClass('svg-loader--hidden')
+    loadProjectUpdateCount()
+  }
 }
 
 function singleProjectTemplate(projectName, projectData, view){
