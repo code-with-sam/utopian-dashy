@@ -142,19 +142,44 @@ padding: 50px 0 75px;
   display: block;
   transform: rotate(-45deg);
 }
+.project__icons {
+  position: absolute;
+  bottom: 18px;
+  right: 20px;
+}
 .project__stat {
   display: block;
   float: right;
-  margin-left: 10px;
+  margin-left: 15px;
   font-weight: 700;
   font-size: 17px;
+  position: relative;
 }
-
+.project__stat svg {
+  display: inline-block;
+  vertical-align: text-top;
+  fill: currentColor;
+  width: 20px;
+  height: 20px;
+}
+.project__stat--comment svg {
+  transform: translateY(2px);
+}
+.project__stat--thumb svg {
+  transform: translateY(-2px);
+}
 .project__name {
   margin-bottom: 10px;
 }
 
 .project__age {
+  position: absolute;
+  bottom: 20px;
+  left: 30px;
+  font-size: 14px;
+}
+.project__stat a {
+  color: #6f749a;
 }
 
 .project__title {
@@ -162,9 +187,66 @@ padding: 50px 0 75px;
 
 }
 .project__desc {
-  margin-bottom: 20px;
+  margin-bottom: 35px;
 }
 
 img {
   max-width: 100%;
+}
+
+p {
+
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+
+}
+.project__stat:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+  cursor: default;
+}
+.tooltiptext {
+  font-size: 12px;
+    visibility: hidden;
+    width: 130px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 5px;
+    border-radius: 6px;
+
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
 }

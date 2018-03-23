@@ -144,14 +144,11 @@ async function displayHeader(username, uniqueProjects, projectData){
   let development = projectData.filter(project => project.json_metadata.type === 'development')
   let profileImage;
   try { profileImage = JSON.parse(user[0].json_metadata).profile.profile_image } catch(error){console.warn(error)}
-  console.log(profileImage)
-
-  let template = `<h1 class="profile__lead"><a href="https://steemit.com/@{username}">@${username}</a> has contributed ${development.length} submissions over ${uniqueProjects.length} Projects</h1>`
+  let template = `<h1 class="profile__lead"><a href="https://steemit.com/@${username}">@${username}</a> has contributed ${development.length} submissions over ${uniqueProjects.length} Projects</h1>`
   $('header').append(template)
 }
 
 function displayProjects(selector, uniqueProjects, projectData) {
-  console.log(uniqueProjects, projectData)
   uniqueProjects.forEach( async (projectName) => {
     let template = await singleProjectTemplate(projectName, projectData)
     $(selector).append(template)
@@ -185,9 +182,16 @@ async function singleProjectTemplate(projectName, projectData){
     <p class="project__desc">${content + '..'}</p>
     <h3 class="project__age">Updated ${age}</h3>
     ${updates}
-    <span class="project__stat">${avgVotes}</span>
-    <span class="project__stat">${avgComments}</span>
-    <span class="project__stat">${repoStars}</span>
+    <div class="project__icons">
+    <span class="project__stat project__stat--comment">
+      <span class="tooltiptext">Average Comments</span>
+      ${avgComments} ${commentIcon}
+    </span>
+      <span class="project__stat project__stat--thumb">
+      <span class="tooltiptext">Average Upvotes</span>
+        ${avgVotes} ${thumbIcon}</span>
+      <span class="project__stat"><A href="${projectURL}">${ghIcon}</a></span>
+    </div>
   </div>`
 }
 
