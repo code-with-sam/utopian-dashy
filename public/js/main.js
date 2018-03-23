@@ -1,37 +1,23 @@
-const octokit = new Octokit()
+
+const commentIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M14 1H2c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1h2v3.5L7.5 11H14c.55 0 1-.45 1-1V2c0-.55-.45-1-1-1zm0 9H7l-2 2v-2H2V2h12v8z"/></svg>'
+const ghIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>'
+const thumbIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M14 14c-.05.69-1.27 1-2 1H5.67L4 14V8c1.36 0 2.11-.75 3.13-1.88 1.23-1.36 1.14-2.56.88-4.13-.08-.5.5-1 1-1 .83 0 2 2.73 2 4l-.02 1.03c0 .69.33.97 1.02.97h2c.63 0 .98.36 1 1l-1 6L14 14zm0-8h-2.02l.02-.98C12 3.72 10.83 0 9 0c-.58 0-1.17.3-1.56.77-.36.41-.5.91-.42 1.41.25 1.48.28 2.28-.63 3.28-1 1.09-1.48 1.55-2.39 1.55H2C.94 7 0 7.94 0 9v4c0 1.06.94 2 2 2h1.72l1.44.86c.16.09.33.14.52.14h6.33c1.13 0 2.84-.5 3-1.88l.98-5.95c.02-.08.02-.14.02-.2-.03-1.17-.84-1.97-2-1.97H14z"/></svg>'
+
+// INIT
+$('.loading__message').removeClass('loading__message--hidden')
 
 if ( $('main').hasClass('profile') ){
   let user = $('main').data('username');
-  console.log(user)
   initProfile(user)
 }
 
 if ( $('main').hasClass('landing') ){
 
-  utopianPendingData('development').then(data => {
-    // console.log('pending: ', data)
-  })
-
   utopianCategoryData('development').then(data => {
-    console.log(data)
-    // let oneWeekAgo = new Date(moment().subtract(7,'days').format('YYYY-MM-DDThh:mm:ss') );
-    // let oneDayAgo = new Date(moment().subtract(1,'days').format('YYYY-MM-DDThh:mm:ss') );
-
-    // let dailyProjects = data.filter( project => new Date(project.created).valueOf() >= oneDayAgo.valueOf() )
-
-
-    // let weeklyDevelopers = [...new Set(weeklyProjects.map(project => project.author))]
-
-    // console.log(weeklyDevelopers, weeklyProjects)
-    // console.log(dailyDevelopers, dailyProjects)
     landingStats(data)
+    let latest = { results : data.filter(project => project.reviewed) }
+    initLatestPosts(latest)
   })
-
-  // $.getJSON('https://api.utopian.io/api/posts?status=flagged&type=development', (data) => {
-  //   console.log(data)
-  // })
-
-  initLatestPosts()
 }
 
 function filterUtopianData(data, modVerdict, timeWindowInDays){
@@ -48,22 +34,16 @@ function filterPreviousUtopianData(data, modVerdict, timeWindowInDaysStart, time
 }
 
 
-function initLatestPosts(){
-  let flagged = 'https://api.utopian.io/api/posts?status=flagged&type=development'
-  let reviewd = 'https://api.utopian.io/api/posts?status=reviewed&type=development&limit=200'
-  $.getJSON(reviewd, (data) => {
+function initLatestPosts(data){
     let projects = getUniqueProjects(data)
-    let projectData = data.results
-    displayProjects('.grid', projects, projectData)
-  })
-
+    displayProjects('.grid', projects, data.results, 'category')
 }
 
 function initProfile(username){
   utopianUserData(username).then( data => {
-      let uniqueProjects = getUniqueProjects(data)
       let projectData = data.results
-      displayProjects('main', uniqueProjects, projectData)
+      let uniqueProjects = getUniqueProjects(data)
+      displayProjects('main', uniqueProjects, projectData, 'profile')
       displayHeader(username, uniqueProjects, projectData)
   })
 }
@@ -78,8 +58,6 @@ function landingStats(data){
   let previousReviewed14 = filterPreviousUtopianData(data, 'reviewed', 7, 14 )
   let previousFlagged48 = filterPreviousUtopianData(data, 'flagged', 1, 2 )
   let previousReviewed48 = filterPreviousUtopianData(data, 'reviewed', 1, 2 )
-
-  console.log('LOG: ', previousFlagged14 , weeklyFlaggedProjects)
 
   let approved24Change = ((dailyapprovedProjects.length - previousReviewed48.length)/previousReviewed48.length)*100
   if (approved24Change < 0) $('.stat__project24--approved-change').addClass('--negative')
@@ -101,11 +79,6 @@ function landingStats(data){
   $('.stat__project7--flagged').text(weeklyFlaggedProjects.length )
   $('.stat__project7--flagged-change').text(  flagged7Change.toFixed(2)+ '%')
 
-  // $('.data.data__developers7').text(weeklyDevelopers.length)
-}
-
-function steemData(username){
-  return steem.api.getAccountsAsync([username])
 }
 
 function utopianPendingData(category){
@@ -140,7 +113,7 @@ function getUniqueProjects(data) {
 }
 
 async function displayHeader(username, uniqueProjects, projectData){
-  let user = await steemData(username);
+  let user = await steem.api.getAccountsAsync([username])
   let development = projectData.filter(project => project.json_metadata.type === 'development')
   let profileImage;
   try { profileImage = JSON.parse(user[0].json_metadata).profile.profile_image } catch(error){console.warn(error)}
@@ -148,14 +121,18 @@ async function displayHeader(username, uniqueProjects, projectData){
   $('header').append(template)
 }
 
-function displayProjects(selector, uniqueProjects, projectData) {
-  uniqueProjects.forEach( async (projectName) => {
-    let template = await singleProjectTemplate(projectName, projectData)
+function displayProjects(selector, uniqueProjects, projectData, view) {
+  let displayProjects = uniqueProjects.slice(0, 20);
+  displayProjects.forEach( (projectName) => {
+    let template = singleProjectTemplate(projectName, projectData, view)
     $(selector).append(template)
   })
+  if(view === 'category') loadProjectUpdateCount()
 }
 
-async function singleProjectTemplate(projectName, projectData){
+function singleProjectTemplate(projectName, projectData, view){
+  projectData = projectData.filter(project => project.json_metadata.repository !== null )
+
   let projectPosts = projectData.filter(project => project.json_metadata.repository.name === projectName)
   let votes = projectPosts.map(project => project.net_votes)
   let avgVotes =  Math.round(projectPosts.reduce((total,post) => total + post.net_votes, 0) / projectPosts.length)
@@ -163,18 +140,12 @@ async function singleProjectTemplate(projectName, projectData){
   let latestUpdate = projectPosts[0]
   let projectURL = latestUpdate.json_metadata.repository.html_url
   let age = moment(latestUpdate.created).startOf('day').fromNow();
-  // let repo = await getGithubRepo(latestUpdate.json_metadata.repository.full_name)
-  // console.log(repo.data.forks_count)
-  // let repoStars = 'repo.data.stargazers_count'
-  let repoStars = '22'
   let latestModifier = projectPosts.length > 1 ? 'Latest: ' : ''
   let desc = getFirstTag('p', latestUpdate.body).split(" ", 20);
   let content = desc.join(" ");
+  let updates = projectPosts.length > 1 ? `<span class="project__updates ${view === 'category' ? 'project__updates--hidden':'' }"><span>${projectPosts.length - 1}</span></span>` : ''
 
-  // console.log(latestUpdate.body)
-  let updates = projectPosts.length > 1 ? `<span class="project__updates"><span>${projectPosts.length - 1}</span></span>` : ''
-
-  return template = `
+  let profileCardTemplate = `
   <div class="project-card">
 
     <h2 class="project__name">${projectName}</h2>
@@ -193,7 +164,34 @@ async function singleProjectTemplate(projectName, projectData){
       <span class="project__stat"><A href="${projectURL}">${ghIcon}</a></span>
     </div>
   </div>`
+  let categoryCardTemplate = `
+  <div class="project-card" data-id="${latestUpdate.json_metadata.repository.id}" data-path="${latestUpdate.json_metadata.repository.full_name}">
+    <h2 class="project__name">${projectName}</h2>
+    <h3 class="project__title">${latestModifier}<a href="https://utopian.io${latestUpdate.url}">${latestUpdate.title}</a> -   <a href="/users/${latestUpdate.author}">@${latestUpdate.author}</a></h3>
+    <p class="project__desc">${content + '..'}</p>
+    <h3 class="project__age">Updated ${age}</h3>
+    ${updates}
+    <div class="project__icons">
+    <span class="project__stat project__stat--comment">
+      <span class="tooltiptext">Average Comments</span>
+      ${avgComments} ${commentIcon}
+    </span>
+      <span class="project__stat project__stat--thumb">
+      <span class="tooltiptext">Average Upvotes</span>
+        ${avgVotes} ${thumbIcon}</span>
+      <span class="project__stat"><A href="${projectURL}">${ghIcon}</a></span>
+    </div>
+  </div>`
+
+  if (view === 'profile') {
+    return profileCardTemplate
+  } else {
+    return categoryCardTemplate
+  }
 }
+
+
+
 
 function getFirstTag(tag, markdown){
   var converter = new showdown.Converter();
@@ -217,4 +215,25 @@ async function getGithubRepo(repoPath){
     owner: owner,
     repo: name
   })
+}
+
+function loadProjectUpdateCount(){
+  let projects = $('.project-card')
+  console.log(projects)
+  projects.each( (i, el) => {
+      let projectId = $(el).data('id')
+      let projectPath = $(el).data('path')
+      let url = `/project/${projectId}`
+      $.getJSON(url, (data) => {
+        $(`*[data-path="${projectPath}"]`).attr('data-updates', data.total)
+        showUpdateCount(projectPath)
+      })
+  })
+
+}
+function showUpdateCount(projectPath){
+  let value = $(`*[data-path="${projectPath}"]`).attr('data-updates')
+  console.log(projectPath, value)
+  $(`*[data-path="${projectPath}"]`).find('.project__updates span').text(value)
+  $(`*[data-path="${projectPath}"]`).find('.project__updates').removeClass('project__updates--hidden')
 }

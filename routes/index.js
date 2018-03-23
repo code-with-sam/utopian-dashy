@@ -3,11 +3,34 @@ var router = express.Router();
 let utopian = require('utopian-api');
 var rp = require('request-promise');
 
+utopian.getPostsByGithubProject = (repoName, options, projectId) => {
+  return new Promise((resolve, reject) => {
+    // return getGithubRepoIdByRepoName(repoName)
+      // .then(projectId => {
+        return utopian.getPosts(Object.assign({
+          section: 'project',
+          sortBy: 'created',
+          platform: 'github',
+          projectId,
+          type: 'development'
+        }, options || {})).then(resolve).catch(reject)
+      // }).catch(reject)
+  })
+}
+
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
    res.render('index', {
-      title: 'Express'
+      title: 'Utopian Dashy'
    });
+});
+
+router.get('/project/:id', (req, res) => {
+
+  utopian.getPostsByGithubProject('',
+    { type: 'development'},req.params.id)
+    .then(data => res.json(data))
 });
 
 router.get('/data/:username', function(req, res) {
@@ -18,53 +41,14 @@ router.get('/data/:username', function(req, res) {
 
 router.get('/category/:category', async (req, res) => {
   let category = req.params.category
-
   let flaggedURL = 'https://api.utopian.io/api/posts?status=flagged&type=development&limit=75'
   let reviewedURL = 'https://api.utopian.io/api/posts?status=reviewed&type=development&limit=225'
   let flaggedProjects = JSON.parse( await rp(flaggedURL) )
   let reviewedProjects =  JSON.parse( await rp(reviewedURL) )
   let projects = flaggedProjects.results.concat(reviewedProjects.results)
   res.json(projects)
-
-
-
-  // let data = [utopian.getPosts({ sortBy: 'created', type: category }),
-  //  utopian.getPosts({ sortBy: 'created', type: category, skip: 50}),
-  //  utopian.getPosts({ sortBy: 'created', type: category, skip: 100}),
-  //  utopian.getPosts({ sortBy: 'created', type: category, skip: 150}),
-  //  utopian.getPosts({ sortBy: 'created', type: category, skip: 200}),
-  //  utopian.getPosts({ sortBy: 'created', type: category, skip: 250}),
-  //  utopian.getPosts({ sortBy: 'created', type: category, skip: 300}) ]
-  //
-  //  Promise.all(data).then((data) => {
-  //    let merge = data.map(x => x.results).reduce((all, arr) => all.concat(arr) ,[])
-  //    res.json(merge)
-  //  });
 });
 
-router.get('/pending/:category', (req, res) => {
-
-
-  console.log(utopian)
-
-  utopian.getPosts({
-      sortBy: 'created'
-  }).then((posts) => {
-    res.json(posts)
-  })
-
-  // utopian.getPendingPostsByModerator('wehmoen')
-  //     .then((data) => {
-  //       res.json(data)
-  //    });
-
-  //   utopian.getPosts({
-  //     status: 'any'
-  //   })
-  //   .then((data) => {
-  //     res.json(data)
-  //  });
-});
 
 
 module.exports = router;
